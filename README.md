@@ -12,23 +12,25 @@ Số phút trên sân là ước tính theo thời điểm thay người và tr�
 
 ## Chuẩn bị Windows
 
-Từ PowerShell trong `E:\machine-learing`:
+Từ PowerShell trong `E:\football-distance`:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r football-distance\requirements.txt
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m ipykernel install --user --name football-ml --display-name "Football ML (.venv)"
 ```
 
 Cần [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) và `pdftoppm` của [Poppler](https://poppler.freedesktop.org/) để chuẩn bị dữ liệu. Trên máy đã triển khai, Tesseract ở `C:\Program Files\Tesseract-OCR\tesseract.exe`, Poppler có trong runtime Codex. Trên máy khác, đặt `pdftoppm` và `tesseract` vào PATH hoặc khai báo `PDFTOPPM_EXE` và `TESSERACT_EXE` là đường dẫn tuyệt đối.
 
 ```powershell
-.\.venv\Scripts\python.exe football-distance\src\project.py prepare
-.\.venv\Scripts\python.exe football-distance\src\project.py train
-.\.venv\Scripts\python.exe -m notebook football-distance\notebooks\football_distance.ipynb
-.\.venv\Scripts\python.exe football-distance\src\project.py predict --input football-distance\examples\player.json
-.\.venv\Scripts\python.exe -m unittest discover -s football-distance\tests -v
+.\.venv\Scripts\python.exe src\project.py prepare
+.\.venv\Scripts\python.exe src\project.py train
+.\.venv\Scripts\python.exe -m notebook notebooks\football_distance.ipynb
+.\.venv\Scripts\python.exe src\project.py predict --input examples\player.json
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-`prepare` tải và đọc 64 PDF, có thể mất nhiều phút. Dữ liệu được cache cục bộ. Notebook đọc dữ liệu đã chuẩn bị và gọi cùng hàm huấn luyện với CLI. Nếu PowerShell chặn `.ps1`, các lệnh trên vẫn chạy trực tiếp qua Python.
+`prepare` tải và đọc 64 PDF, có thể mất nhiều phút. Dữ liệu được cache cục bộ. Notebook đọc dữ liệu đã chuẩn bị và gọi cùng hàm huấn luyện với CLI. Chọn kernel **Football ML (.venv)** trong Jupyter. Nếu PowerShell chặn `.ps1`, các lệnh trên vẫn chạy trực tiếp qua Python.
 
 ## Phương pháp
 

@@ -4,3 +4,4 @@ models/
 reports/
 .ipynb_checkpoints/
 __pycache__/
+.venv/
