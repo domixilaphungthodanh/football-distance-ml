@@ -1,5 +1,7 @@
 # Học Machine Learning qua xG (Expected Goals)
 
+[Mở notebook trên Google Colab](https://colab.research.google.com/github/domixilaphungthodanh/football-distance-ml/blob/main/xg/notebooks/learn_xg.ipynb) rồi chọn **Runtime → Run all** để thực hành trong trình duyệt. Cell đầu tự lấy mã nguồn từ GitHub; lần đầu tải dữ liệu 64 trận có thể mất vài phút. Nếu Colab báo thiếu thư viện, chạy `!pip install -r /content/football-distance-ml/requirements.txt` trong một cell rồi chạy lại notebook.
+
 ![StatsBomb](https://raw.githubusercontent.com/hudl/open-data/master/img/SB%20-%20Icon%20Lockup%20-%20Colour%20positive.png)
 
 **Nguồn dữ liệu: [StatsBomb Open Data](https://github.com/hudl/open-data)**, các trận FIFA World Cup nam 2022. StatsBomb công bố [dữ liệu giải đấu](https://statsbomb.com/news/statsbomb-release-free-2022-world-cup-data/) và yêu cầu ghi nguồn, dùng logo khi chia sẻ phân tích. Repository này chỉ lưu mã và hướng dẫn; dữ liệu JSON tải về, bảng trích xuất, mô hình và báo cáo được giữ trên máy.
