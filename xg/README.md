@@ -14,7 +14,27 @@ Dự án này chỉ xét cú sút trong trận World Cup 2022, bỏ sút luân l
 
 ## Làm theo từng bước
 
-Từ PowerShell trong `E:\football-distance` (repo bóng đá):
+Mở **PowerShell** và dán lần lượt các lệnh sau. File `run-xg.cmd` chạy trực tiếp từ PowerShell, kể cả khi máy chặn file `.ps1`:
+
+```powershell
+cd E:\football-distance
+.\xg\run-xg.cmd prepare
+.\xg\run-xg.cmd test
+.\xg\run-xg.cmd train
+.\xg\run-xg.cmd predict
+.\xg\run-xg.cmd notebook
+```
+
+Trên máy Windows của bạn hiện nay, `prepare` và `test` chạy được; `train`, `predict` và cell huấn luyện trong notebook vẫn bị chính sách Application Control chặn scikit-learn. File `.cmd` chỉ giúp gọi lệnh từ PowerShell, không thay đổi chính sách Windows. Để chạy trọn bài học ngay, dùng liên kết Colab ở đầu trang.
+
+Muốn **đọc mã Python ngay trong PowerShell**, dùng `Get-Content`. Muốn sửa mã, dùng VS Code:
+
+```powershell
+Get-Content .\xg\src\project.py -TotalCount 80
+code .\xg\src\project.py
+```
+
+`prepare` tạo bảng cú sút; `train` huấn luyện và lưu mô hình; `predict` chạy ví dụ trong `xg/examples/shot.json`; `notebook` mở bài học. Bạn cũng có thể chạy từng lệnh Python trực tiếp từ PowerShell:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
