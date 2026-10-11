@@ -40,6 +40,12 @@ Nếu chưa có `.venv`, chạy `python -m venv .venv` trước. Các lệnh g�
 
 Kết quả thật sau khi chạy nằm ở `reports/xg/results.json`, `model_comparison.csv`, `test_predictions.csv`, `evaluation.png`. Mô hình lưu tại `models/xg_world_cup_2022.joblib`. Các file này chỉ có trên máy của bạn. File `joblib` nên chỉ tải từ nguồn bạn tin tưởng.
 
+### Kết quả đã kiểm chứng
+
+[Lượt chạy GitHub Actions](https://github.com/domixilaphungthodanh/football-distance-ml/actions/workflows/xg.yml) đã chạy chuẩn bị dữ liệu, kiểm thử, huấn luyện, dự đoán mẫu và toàn bộ notebook. Dữ liệu có **64 trận, 1.430 cú sút, 152 bàn thắng**. Chia theo trận tạo **51 trận/1.119 cú sút train** và **13 trận/311 cú sút test**. Hồi quy logistic có Brier score cross-validation thấp nhất trong ba mô hình thử nghiệm. Trên test, Brier là **0,0761**, log loss **0,2682**, ROC AUC **0,8110**; baseline Brier **0,0949**. Điểm xG do StatsBomb cung cấp có Brier **0,0691** trên cùng test để tham khảo. Mô hình học tập dùng ít đặc điểm hơn và không dùng điểm StatsBomb làm đầu vào. Kết quả có thể thay đổi nếu dữ liệu nguồn hoặc phiên bản thư viện thay đổi.
+
+Nếu Windows báo `Application Control policy has blocked this file` khi nạp scikit-learn, chính sách ký mã trên máy đang chặn thư viện. Phần `prepare` vẫn chạy được, còn `train`, `predict` và cell huấn luyện trong notebook cần môi trường cho phép scikit-learn. Trên máy đã triển khai, lỗi này được xác nhận trong nhật ký Code Integrity; lượt chạy GitHub Actions ở trên kiểm chứng toàn bộ quy trình trong môi trường Linux.
+
 ## Giới hạn
 
 Đây là mô hình học tập từ một giải đấu và một số đặc điểm đơn giản. Góc sút là góc hình học trên tọa độ sân StatsBomb, không tính vị trí thủ môn hoặc hậu vệ. Một cú sút bị chặn vẫn có nhãn `0`. Kết quả trên test phản ánh khả năng áp dụng cho **trận khác cùng giải**, chưa chứng minh cho các giải khác. Brier hoặc AUC tốt không bảo đảm xác suất đã được hiệu chỉnh tốt ở mọi khoảng xG; hãy xem biểu đồ hiệu chỉnh và số cú sút trong từng khoảng.
