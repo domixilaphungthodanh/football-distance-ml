@@ -1,5 +1,7 @@
 # Dự đoán quãng đường di chuyển của cầu thủ sau trận
 
+Dự án học tiếp: [xG — xác suất một cú sút thành bàn](xg/README.md).
+
 Dự án hồi quy có giám sát, một dòng là một cầu thủ trong một trận World Cup nam 2022. Mục tiêu là tổng quãng đường di chuyển theo km. Bốn nhóm vị trí: thủ môn, hậu vệ, tiền vệ, tiền đạo.
 
 ## Nguồn và quyền sử dụng

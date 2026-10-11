@@ -1,0 +1,28 @@
+name: Verify xG project
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'xg/**'
+      - 'requirements.txt'
+      - '.github/workflows/xg.yml'
+  workflow_dispatch:
+
+jobs:
+  xg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest discover -s xg/tests -v
+      - run: python xg/src/project.py prepare
+      - run: python xg/src/project.py train
+      - run: python xg/src/project.py predict --input xg/examples/shot.json
+      - run: python -m ipykernel install --user --name football-ml --display-name 'Football ML (.venv)'
+      - run: python -m nbconvert --to notebook --execute xg/notebooks/learn_xg.ipynb --output verified.ipynb --output-dir /tmp --ExecutePreprocessor.timeout=600

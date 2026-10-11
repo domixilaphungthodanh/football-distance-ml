@@ -1,0 +1,45 @@
+# Học Machine Learning qua xG (Expected Goals)
+
+![StatsBomb](https://raw.githubusercontent.com/hudl/open-data/master/img/SB%20-%20Icon%20Lockup%20-%20Colour%20positive.png)
+
+**Nguồn dữ liệu: [StatsBomb Open Data](https://github.com/hudl/open-data)**, các trận FIFA World Cup nam 2022. StatsBomb công bố [dữ liệu giải đấu](https://statsbomb.com/news/statsbomb-release-free-2022-world-cup-data/) và yêu cầu ghi nguồn, dùng logo khi chia sẻ phân tích. Repository này chỉ lưu mã và hướng dẫn; dữ liệu JSON tải về, bảng trích xuất, mô hình và báo cáo được giữ trên máy.
+
+## xG có nghĩa là gì?
+
+Một cú sút có `xG = 0.20` nghĩa là mô hình ước tính **20% khả năng thành bàn** trong các tình huống tương tự. xG là xác suất *trước khi biết kết quả cú sút*, không phải lời khẳng định cú sút này chắc chắn ghi bàn. Tổng xG của đội là tổng xác suất các cú sút, không phải số bàn thắng chắc chắn sẽ có.
+
+Dự án này chỉ xét cú sút trong trận World Cup 2022, bỏ sút luân lưu và phạt đền vì phạt đền có tình huống cố định khác biệt. Mỗi dòng dữ liệu là một cú sút; nhãn `goal = 1` nếu cú sút thành bàn, ngược lại `0`. Các đầu vào: tọa độ sút `x, y`, khoảng cách và góc nhìn khung thành suy ra từ tọa độ, bộ phận cơ thể, kiểu sút, có bị gây áp lực và sút một chạm. Tọa độ StatsBomb dùng sân 120 × 80, cầu môn ở `(120, 40)`. Các trường kết quả cú sút, điểm `statsbomb_xg` có sẵn, vị trí bóng sau cú sút và khung hình cầu thủ **không được dùng làm đầu vào**.
+
+## Làm theo từng bước
+
+Từ PowerShell trong `E:\football-distance` (repo bóng đá):
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe xg\src\project.py prepare
+.\.venv\Scripts\python.exe xg\src\project.py train
+.\.venv\Scripts\python.exe -m notebook xg\notebooks\learn_xg.ipynb
+.\.venv\Scripts\python.exe xg\src\project.py predict --input xg\examples\shot.json
+.\.venv\Scripts\python.exe -m unittest discover -s xg\tests -v
+```
+
+Nếu chưa có `.venv`, chạy `python -m venv .venv` trước. Các lệnh gọi trực tiếp `python.exe`, nên PowerShell không cần cho phép chạy file `.ps1`. Chọn kernel **Football ML (.venv)** trong Jupyter. Nếu kernel chưa có, chạy:
+
+```powershell
+.\.venv\Scripts\python.exe -m ipykernel install --user --name football-ml --display-name "Football ML (.venv)"
+```
+
+`prepare` tải danh sách trận và sự kiện của 64 trận lần đầu; có thể mất vài phút. Lần sau dữ liệu được đọc từ `xg/data/raw/`. Chạy notebook bằng **Restart Kernel & Run All** sau khi chuẩn bị dữ liệu. Notebook gọi cùng hàm với CLI nên kết quả thống nhất.
+
+1. **Đọc dữ liệu:** `prepare` lọc sự kiện Shot, chuyển thành bảng và kiểm tra đủ 64 trận. Xem `xg/data/processed/shots_2022.csv`; mỗi dòng là một cú sút.
+2. **Hiểu nhãn và đặc điểm:** Notebook đếm bàn thắng, xem vị trí sút, rồi minh họa phép tính khoảng cách và góc. Đây là dữ liệu để mô hình học mối liên hệ giữa hoàn cảnh sút và bàn thắng.
+3. **Chia dữ liệu:** giữ khoảng 20% **trận** làm test với seed 42. Toàn bộ cú sút của một trận đi cùng tập, tránh đánh giá quá lạc quan do các cú sút cùng trận có chung bối cảnh.
+4. **Học trên tập train:** so sánh mô hình đoán tỷ lệ bàn chung (`baseline`), hồi quy logistic và rừng ngẫu nhiên. `GroupKFold` chia 5 lượt theo trận; mỗi lượt chỉ học bước điền thiếu, chuẩn hóa và mã hóa từ phần train của lượt đó.
+5. **Chọn và đánh giá:** chọn theo **Brier score** cross-validation thấp nhất. Brier là trung bình `(xG - goal)²`, càng thấp càng tốt. Chỉ sau khi chọn xong mới đo trên test. Xem thêm log loss, ROC AUC và biểu đồ hiệu chỉnh. Điểm xG của StatsBomb, nếu có, được báo cáo riêng để tham khảo; mô hình học tập không dùng nó làm đầu vào.
+6. **Dùng mô hình:** `predict` đọc JSON như `xg/examples/shot.json`, kiểm tra kiểu dữ liệu, trả về `xg` và phần trăm. Nếu tình huống ngoài phạm vi dữ liệu train, kết quả kèm cảnh báo.
+
+Kết quả thật sau khi chạy nằm ở `reports/xg/results.json`, `model_comparison.csv`, `test_predictions.csv`, `evaluation.png`. Mô hình lưu tại `models/xg_world_cup_2022.joblib`. Các file này chỉ có trên máy của bạn. File `joblib` nên chỉ tải từ nguồn bạn tin tưởng.
+
+## Giới hạn
+
+Đây là mô hình học tập từ một giải đấu và một số đặc điểm đơn giản. Góc sút là góc hình học trên tọa độ sân StatsBomb, không tính vị trí thủ môn hoặc hậu vệ. Một cú sút bị chặn vẫn có nhãn `0`. Kết quả trên test phản ánh khả năng áp dụng cho **trận khác cùng giải**, chưa chứng minh cho các giải khác. Brier hoặc AUC tốt không bảo đảm xác suất đã được hiệu chỉnh tốt ở mọi khoảng xG; hãy xem biểu đồ hiệu chỉnh và số cú sút trong từng khoảng.
